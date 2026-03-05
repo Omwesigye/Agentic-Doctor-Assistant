@@ -1,3 +1,4 @@
+# Django & REST
 django>=4.2
 djangorestframework
 django-allauth
@@ -10,7 +11,7 @@ redis
 django-redis
 gunicorn
 whitenoise
-widget-tweaks
+django-widget-tweaks>=1.5.8
 
 # AI & RAG
 openai
