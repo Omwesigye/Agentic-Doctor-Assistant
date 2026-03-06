@@ -98,45 +98,41 @@ ASGI_APPLICATION = 'core.asgi.application'
 
 # Database
 
-
+# Database
 DATABASES = {
     'default': dj_database_url.config(
-        # This pulls the DATABASE_URL environment variable from Render
         default=os.getenv('DATABASE_URL'),
         conn_max_age=600,
         ssl_require=True
     )
 }
+
+# --- FIXED SECTION START ---
 if not DEBUG:
-   # 1. Unified ALLOWED_HOSTS
-    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+    # 1. Unified ALLOWED_HOSTS (Only applies in Production)
+    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "agenticdoctorassistant.onrender.com").split(",")
+    
+    RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME')
+    if RENDER_EXTERNAL_HOSTNAME:
+        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
-# Always add the specific production URL for safety
-if 'agenticdoctorassistant.onrender.com' not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append('agenticdoctorassistant.onrender.com')
-
-# 2. Unified CSRF & Security
-# We use 'not DEBUG' to ensure these apply in production
-if not DEBUG:
+    # 2. Unified CSRF & Security
     CSRF_TRUSTED_ORIGINS = [
         "https://*.onrender.com",
         "https://agenticdoctorassistant.onrender.com",
     ]
+    
     # Vital for Render's load balancer to communicate HTTPS to Django
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
-    
-    # Static files security
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
+else:
+    # Local Development Settings
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+# --- FIXED SECTION END ---
 
-# Redis Cache
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
