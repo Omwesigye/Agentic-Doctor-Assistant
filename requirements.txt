@@ -12,6 +12,7 @@ django-redis
 gunicorn
 whitenoise
 django-widget-tweaks
+daphne
 
 # AI & RAG
 openai
