@@ -13,6 +13,7 @@ gunicorn
 whitenoise
 django-widget-tweaks
 daphne
+Pillow
 
 # AI & RAG
 openai
