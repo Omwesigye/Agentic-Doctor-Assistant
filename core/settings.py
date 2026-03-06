@@ -14,10 +14,26 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-your-secret-key-her
 
 DEBUG = os.getenv('DEBUG', 'False') == 'False'
 
-ALLOWED_HOSTS = os.getenv(
-    "ALLOWED_HOSTS",
-    "localhost,127.0.0.1,.onrender.com"
-).split(",")
+# Change this to properly evaluate "True" as True
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+
+# Simplify ALLOWED_HOSTS
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
+# Add the Render external URL explicitly if not in DEBUG
+RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    # Also add the specific one from your logs just to be safe
+    ALLOWED_HOSTS.append('agenticdoctorassistant.onrender.com')
+
+if not DEBUG:
+    CSRF_TRUSTED_ORIGINS = [
+        "https://*.onrender.com",
+        "https://agenticdoctorassistant.onrender.com",
+    ]
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -82,10 +98,13 @@ ASGI_APPLICATION = 'core.asgi.application'
 
 # Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        # This will use DATABASE_URL from Render, 
+        # falling back to local sqlite only if DATABASE_URL isn't found.
+        default=os.getenv('DATABASE_URL', f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
+        conn_max_age=600,
+        ssl_require=True if not DEBUG else False
+    )
 }
 if not DEBUG:
     ALLOWED_HOSTS = os.getenv(
