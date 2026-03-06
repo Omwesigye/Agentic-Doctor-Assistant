@@ -11,7 +11,7 @@ redis
 django-redis
 gunicorn
 whitenoise
-django-widget-tweaks>=1.5.8
+django-widget-tweaks
 
 # AI & RAG
 openai
