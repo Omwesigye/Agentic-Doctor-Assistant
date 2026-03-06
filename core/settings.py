@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-your-secret-key-here')
 
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = os.getenv('DEBUG', 'False') == 'False'
 
 ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",
@@ -87,17 +87,15 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 if not DEBUG:
-    DATABASES['default'] = dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600
-    )
-
-    ALLOWED_HOSTS = ['.onrender.com']
-
+    ALLOWED_HOSTS = os.getenv(
+        "ALLOWED_HOSTS",
+        ".onrender.com,agenticdoctorassistant.onrender.com"
+    ).split(",")
+    
     CSRF_TRUSTED_ORIGINS = [
         "https://*.onrender.com",
+        "https://agenticdoctorassistant.onrender.com",
     ]
 
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -113,7 +111,7 @@ CACHES = {
 
 # Channel layers for WebSocket (use Redis if channels_redis installed, else in-memory)
 try:
-    import channels_redis  # noqa: F401
+    import channels_redis
     CHANNEL_LAYERS = {
         'default': {
             'BACKEND': 'channels_redis.core.RedisChannelLayer',
