@@ -3,7 +3,7 @@ django>=4.2
 djangorestframework
 django-allauth
 django-cors-headers
-django-channels
+channels
 channels-redis
 python-dotenv
 psycopg2-binary
