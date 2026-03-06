@@ -97,13 +97,14 @@ WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
 # Database
+
+
 DATABASES = {
     'default': dj_database_url.config(
-        # This will use DATABASE_URL from Render, 
-        # falling back to local sqlite only if DATABASE_URL isn't found.
-        default=os.getenv('DATABASE_URL', f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
+        # This pulls the DATABASE_URL environment variable from Render
+        default=os.getenv('DATABASE_URL'),
         conn_max_age=600,
-        ssl_require=True if not DEBUG else False
+        ssl_require=True
     )
 }
 if not DEBUG:
